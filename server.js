@@ -37,7 +37,11 @@ app.use(cookieParser());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-app.use(fileUpload());
+app.use(
+  fileUpload({
+    createParentPath: true
+  })
+);
 
 // Sanitize Data
 app.use(mongoSanitize());

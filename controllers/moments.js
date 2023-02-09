@@ -2,6 +2,7 @@ const path = require('path');
 const asyncHandler = require('../middleware/async');
 const Moment = require('../models/Moment');
 const ErrorResponse = require('../utils/errorResponse');
+const uploadFile = require('../middleware/upload');
 
 //@desc Get all moments
 //@route Get /api/v1/moments
@@ -30,39 +31,10 @@ exports.getMoment = asyncHandler(async (req, res, next) => {
 //@access Public
 
 exports.createMoment = asyncHandler(async (req, res, next) => {
-  const moment = await Moment.findById(req.params.id);
-  if (!req.body.image) {
-    return next(new ErrorResponse('Please upload a file', 400));
-  }
-  const file = req.body.image;
-  if (file == '') {
-    return next(new ErrorResponse('Please upload an image property', 400));
-  }
-  // Check filesize
-  if (file.size > process.env.MAX_FILE_UPLOAD) {
-    return next(
-      new ErrorResponse(
-        `Please upload an imageless than ${process.env.MAX_FILE_UPLOAD}`,
-        400
-      )
-    );
-  }
-  // Create custome file name
-  file.name = `photo_${moment._id}${path.parse(file.name).ext}`;
-  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
-    if (err) {
-      console.error(err);
-      return next(
-        new ErrorResponse(
-          `Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`,
-          400
-        )
-      );
-    }
-  });
-  const updated_moment = await Moment.create(req.body);
-  console.log('Image', req.body);
-  res.status(200).json({ success: true, data: updated_moment });
+  const moment = await Moment.create(req.body);
+  res.status(200).json({
+    success: true,
+    data: moment
 });
 
 //@desc Update Moment
